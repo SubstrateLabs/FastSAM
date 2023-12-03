@@ -116,7 +116,8 @@ class FastSAMPrompt:
         plt.gca().xaxis.set_major_locator(plt.NullLocator())
         plt.gca().yaxis.set_major_locator(plt.NullLocator())
 
-        plt.imshow(image)
+        black_background = np.zeros((original_h, original_w, 3), dtype=np.uint8)
+        plt.imshow(black_background)
         if better_quality:
             if isinstance(annotations[0], torch.Tensor):
                 annotations = np.array(annotations.cpu())
@@ -242,9 +243,11 @@ class FastSAMPrompt:
         index = (annotation != 0).argmax(axis=0)
         if random_color:
             color = np.random.random((msak_sum, 1, 1, 3))
+            transparency = np.ones((msak_sum, 1, 1, 1)) * 0.6
         else:
-            color = np.ones((msak_sum, 1, 1, 3)) * np.array([30 / 255, 144 / 255, 255 / 255])
-        transparency = np.ones((msak_sum, 1, 1, 1)) * 0.6
+            color = np.ones((msak_sum, 1, 1, 3)) * np.array([1, 1, 1])
+            transparency = np.ones((msak_sum, 1, 1, 1))
+
         visual = np.concatenate([color, transparency], axis=-1)
         mask_image = np.expand_dims(annotation, -1) * visual
 
@@ -298,10 +301,12 @@ class FastSAMPrompt:
         index = (annotation != 0).to(torch.long).argmax(dim=0)
         if random_color:
             color = torch.rand((msak_sum, 1, 1, 3)).to(annotation.device)
+            transparency = torch.ones((msak_sum, 1, 1, 1)).to(annotation.device) * 0.6
         else:
             color = torch.ones((msak_sum, 1, 1, 3)).to(annotation.device) * torch.tensor([
-                30 / 255, 144 / 255, 255 / 255]).to(annotation.device)
-        transparency = torch.ones((msak_sum, 1, 1, 1)).to(annotation.device) * 0.6
+                1, 1, 1]).to(annotation.device)
+            transparency = torch.ones((msak_sum, 1, 1, 1)).to(annotation.device)
+
         visual = torch.cat([color, transparency], dim=-1)
         mask_image = torch.unsqueeze(annotation, -1) * visual
         # Select data according to the index. The index indicates which batch's data to choose at each position, converting the mask_image into a single batch form.

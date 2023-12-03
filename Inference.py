@@ -1,5 +1,5 @@
 import argparse
-from fastsam import FastSAM, FastSAMPrompt 
+from fastsam import FastSAM, FastSAMPrompt
 import ast
 import torch
 from PIL import Image
@@ -31,7 +31,7 @@ def parse_args():
         "--output", type=str, default="./output/", help="image save path"
     )
     parser.add_argument(
-        "--randomcolor", type=bool, default=True, help="mask random color"
+        "--randomcolor", type=bool, default=False, help="mask random color"
     )
     parser.add_argument(
         "--point_prompt", type=str, default="[[0,0]]", help="[[x1,y1],[x2,y2]]"
@@ -42,7 +42,12 @@ def parse_args():
         default="[0]",
         help="[1,0] 0:background, 1:foreground",
     )
-    parser.add_argument("--box_prompt", type=str, default="[[0,0,0,0]]", help="[[x,y,w,h],[x2,y2,w2,h2]] support multiple boxes")
+    parser.add_argument(
+        "--box_prompt",
+        type=str,
+        default="[[0,0,0,0]]",
+        help="[[x,y,w,h],[x2,y2,w2,h2]] support multiple boxes",
+    )
     parser.add_argument(
         "--better_quality",
         type=str,
@@ -85,15 +90,15 @@ def main(args):
         retina_masks=args.retina,
         imgsz=args.imgsz,
         conf=args.conf,
-        iou=args.iou    
-        )
+        iou=args.iou,
+    )
     bboxes = None
     points = None
     point_label = None
     prompt_process = FastSAMPrompt(input, everything_results, device=args.device)
     if args.box_prompt[0][2] != 0 and args.box_prompt[0][3] != 0:
-            ann = prompt_process.box_prompt(bboxes=args.box_prompt)
-            bboxes = args.box_prompt
+        ann = prompt_process.box_prompt(bboxes=args.box_prompt)
+        bboxes = args.box_prompt
     elif args.text_prompt != None:
         ann = prompt_process.text_prompt(text=args.text_prompt)
     elif args.point_prompt[0] != [0, 0]:
@@ -106,15 +111,14 @@ def main(args):
         ann = prompt_process.everything_prompt()
     prompt_process.plot(
         annotations=ann,
-        output_path=args.output+args.img_path.split("/")[-1],
-        bboxes = bboxes,
-        points = points,
-        point_label = point_label,
+        output_path=args.output + args.img_path.split("/")[-1],
+        bboxes=bboxes,
+        points=points,
+        point_label=point_label,
         withContours=args.withContours,
         better_quality=args.better_quality,
+        mask_random_color=args.randomcolor,
     )
-
-
 
 
 if __name__ == "__main__":
