@@ -8,6 +8,7 @@ Usage - Predict:
     model = FastSAM('last.pt')
     results = model.predict('ultralytics/assets/bus.jpg')
 """
+import traceback
 
 from ultralytics.yolo.cfg import get_cfg
 from ultralytics.yolo.engine.exporter import Exporter
@@ -50,7 +51,8 @@ class FastSAM(YOLO):
         try:
             return self.predictor(source, stream=stream)
         except Exception as e:
-            print(f"ERROR: {e}")
+            print(f"### FASTSAM ERROR")
+            traceback.print_exception(type(e), e, e.__traceback__)
             return None
 
     def train(self, **kwargs):
