@@ -52,7 +52,10 @@ class FastSAM(YOLO):
             return self.predictor(source, stream=stream)
         except Exception as e:
             print(f"### FASTSAM ERROR")
-            traceback.print_exception(type(e), e, e.__traceback__)
+            print(f"### {e}")
+            print('## printing traceback')
+            print(traceback.format_exc())
+            print('## printing traceback end')
             return None
 
     def train(self, **kwargs):
