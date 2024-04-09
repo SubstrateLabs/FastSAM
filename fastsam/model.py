@@ -40,13 +40,20 @@ class FastSAM(YOLO):
         if source is None:
             source = ROOT / 'assets' if is_git_dir() else 'https://ultralytics.com/images/bus.jpg'
             LOGGER.warning(f"WARNING ⚠️ 'source' is missing. Using 'source={source}'.")
+        print('#### FASTSAM kwargs')
+        print(kwargs)
+        print('### FASTSAM before overrides self.overrides')
+        print(self.overrides)
         overrides = self.overrides.copy()
         overrides['conf'] = 0.25
         overrides.update(kwargs)  # prefer kwargs
+        print('### FASTSAM overrides after kwargs update')
+        print(overrides)
         overrides['mode'] = kwargs.get('mode', 'predict')
         assert overrides['mode'] in ['track', 'predict']
         overrides['save'] = kwargs.get('save', False)  # do not save by default if called in Python
-        print('#### overrides', overrides)
+        print('#### final overrides')
+        print(overrides)
         self.predictor = FastSAMPredictor(overrides=overrides)
         self.predictor.setup_model(model=self.model, verbose=False)
         try:
