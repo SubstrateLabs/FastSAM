@@ -49,6 +49,12 @@ class FastSAM(YOLO):
         self.predictor = FastSAMPredictor(overrides=overrides)
         self.predictor.setup_model(model=self.model, verbose=False)
         try:
+            print(f"### FASTSAM MODEL", self.model)
+            print(f"### FASTSAM PREDICTOR MODEL", self.predictor.model)
+            print(f"### FASTSAM MODEL stride", self.model.stride)
+            print(f"### FASTSAM PREDICTOR MODEL stride", self.predictor.model.stride)
+            print("### FASTSAM MODEL predictor args", self.predictor.args)
+            print(f"### FASTSAM predictor args imgsz", self.predictor.args.imgsz)
             return self.predictor(source, stream=stream)
         except Exception as e:
             print(f"### FASTSAM ERROR")
